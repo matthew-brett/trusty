@@ -5,8 +5,20 @@ COPY choose_python.sh /usr/bin/
 # Installer script for Pythons 2.7 3.4 3.5 3.6
 COPY build_install_pythons.sh /
 
-# Install Pythons 2.7 3.4 3.5 3.6 and matching pips
-RUN bash build_install_pythons.sh && rm build_install_pythons.sh
+# Install Pythons 2.7 3.4 3.5 3.6 3.3 2.6 and matching pips
+RUN bash -c "source /build_install_pythons.sh && get_pythons_from_deadsnake"
+
+#Install Python 2.7.11 narrow, 3.7, 3.8.0rc1
+RUN bash -c "source /build_install_pythons.sh && install_build_dep"
+RUN bash -c "source /build_install_pythons.sh && build_2_7_11_narrow"
+RUN bash -c "source /build_install_pythons.sh && build_openssl 1.0.2o"
+RUN bash -c "source /build_install_pythons.sh && compile_python 3.7.0 --with-openssl=/usr/local/ssl"
+RUN bash -c "source /build_install_pythons.sh && compile_python 3.8.0 --with-openssl=/usr/local/ssl 3.8.0rc1"
+# Post install and cleanup
+RUN bash -c "source /build_install_pythons.sh && install_certificates"
+RUN bash -c "source /build_install_pythons.sh && install_build_dep uninstall"
+
+RUN bash -c "rm build_install_pythons.sh"
 
 # Install manylinux1 libraries. See:
 # https://www.python.org/dev/peps/pep-0513/#the-manylinux1-policy
