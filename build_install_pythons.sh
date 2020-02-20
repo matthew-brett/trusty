@@ -1,5 +1,5 @@
 #!/bin/bash
-# Install Pythons 2.7 3.4 3.5 3.6 3.7 3.8rc1 and matching pips
+# Install Pythons and matching pips
 set -ex
 
 echo "deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu trusty main" > /etc/apt/sources.list.d/deadsnakes.list
@@ -79,8 +79,8 @@ function build_openssl {
 
 build_openssl 1.0.2o
 # Compiled Pythons need to be flagged in the choose_python.sh script.
-compile_python 3.7.0 "--with-openssl=/usr/local/ssl"
-compile_python 3.8.0rc1 "--with-openssl=/usr/local/ssl"
+compile_python 3.7.6 "--with-openssl=/usr/local/ssl"
+compile_python 3.8.1 "--with-openssl=/usr/local/ssl"
 
 # Install certificates from certifi, for Python 3.7
 # Thanks to Github user Mr BitBucket for this fix.
