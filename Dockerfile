@@ -1,7 +1,7 @@
 # Originaly from https://github.com/M0E-lnx/ubuntu-32bit with thanks.
 FROM scratch
-# Download from https://partner-images.canonical.com/core/trusty/current/ubuntu-trusty-core-cloudimg-i386-root.tar.gz
-ADD ubuntu-trusty-core-cloudimg-i386-root.tar.gz /
+# Download from https://partner-images.canonical.com/core/bionic/current/ubuntu-bionic-core-cloudimg-i386-root.tar.gz
+ADD ubuntu-bionic-core-cloudimg-i386-root.tar.gz /
 
 # a few minor docker-specific tweaks
 # see https://github.com/docker/docker/blob/master/contrib/mkimage/debootstrap
@@ -23,6 +23,8 @@ RUN echo '#!/bin/sh' > /usr/sbin/policy-rc.d \
 	\
 	&& echo 'Acquire::GzipIndexes "true"; Acquire::CompressionTypes::Order:: "gz";' > /etc/apt/apt.conf.d/docker-gzip-indexes
 
+RUN apt update
+RUN apt install -y gnupg
 # Script to choose Python version
 COPY choose_python.sh /usr/bin/
 # Installer script for Pythons

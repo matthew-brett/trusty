@@ -2,24 +2,23 @@
 # Install Pythons and matching pips
 set -ex
 
-echo "deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu trusty main" > /etc/apt/sources.list.d/deadsnakes.list
+echo "deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu bionic main" > /etc/apt/sources.list.d/deadsnakes.list
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6A755776
 apt-get update
 apt-get install -y wget
 PIP_ROOT_URL="https://bootstrap.pypa.io"
 wget $PIP_ROOT_URL/get-pip.py
-for pyver in 3.4 3.5 3.6 2.7 2.6 3.3 ; do
+apt-get install -y python3-distutils
+for pyver in 3.5 3.6 3.7 3.8 2.7; do
     pybin=python$pyver
-    apt-get install -y ${pybin}-dev ${pybin}-tk
+    apt-get install -y ${pybin}-dev
     get_pip_fname="get-pip.py"
-    for badver in 2.6 3.3 ; do
-        if [ "$pyver" == "$badver" ]; then
-            get_pip_fname="get-pip-${pyver}.py"
-            wget $PIP_ROOT_URL/${pyver}/get-pip.py -O $get_pip_fname
-        fi
-    done
     ${pybin} ${get_pip_fname}
 done
+apt-get install -y python-tk
+apt-get install -y python3.5-tk
+# this is one package for all versions 3.6+
+apt-get install -y python3.6-tk
 
 # Get virtualenv for Python 3.5
 pip3.5 install --user virtualenv
@@ -56,7 +55,7 @@ function compile_python {
 
 # Compile narrow unicode Python
 # Compiled Pythons need to be flagged in the choose_python.sh script.
-compile_python 2.7.11 "--enable-unicode=ucs2"
+compile_python 2.7.15 "--enable-unicode=ucs2"
 # Get pip for narrow unicode Python
 /opt/cp27m/bin/python get-pip.py
 
@@ -75,27 +74,6 @@ function build_openssl {
     make install)
     rm -rf ${froot} ${ftgz}
 }
-
-build_openssl 1.0.2o
-# Compiled Pythons need to be flagged in the choose_python.sh script.
-compile_python 3.7.6 "--with-openssl=/usr/local/ssl"
-compile_python 3.8.1 "--with-openssl=/usr/local/ssl"
-
-# Install certificates from certifi, for Python 3.7
-# Thanks to Github user Mr BitBucket for this fix.
-# Make virtuelenv for certifi install.
-/root/.local/bin/virtualenv --python=/opt/cp37m/bin/python3 venv
-. venv/bin/activate
-# Install certifi and copy .pem file to system locaation.
-pip install certifi
-CERTIFI_CERT=$(python -c "import certifi; print(certifi.where())")
-DEFAULT_CERT=$(python -c"import ssl; print(ssl.get_default_verify_paths().openssl_cafile)")
-echo "CERTIFI_CERT=$CERTIFI_CERT"
-echo "DEFAULT_CERT=$DEFAULT_CERT"
-cp ${CERTIFI_CERT} ${DEFAULT_CERT}
-deactivate
-# Remove virtualenv files from image
-rm -rf venv
 
 # Clean out not-needed packages
 apt-get -y remove $BUILD_PKGS
