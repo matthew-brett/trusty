@@ -25,7 +25,7 @@ RUN echo '#!/bin/sh' > /usr/sbin/policy-rc.d \
 
 # Script to choose Python version
 COPY choose_python.sh /usr/bin/
-# Installer script for Pythons 2.7 3.4 3.5 3.6 3.7
+# Installer script for Pythons
 COPY build_install_pythons.sh /
 
 # Install Pythons 2.7 3.4 3.5 3.6 3.7 and matching pips
