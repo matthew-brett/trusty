@@ -1,5 +1,5 @@
 #!/bin/bash
-# Install Pythons 2.7 3.4 3.5 3.6 3.7 3.8rc1 and matching pips
+# Install Pythons 2.7 3.4 3.5 3.6 3.7 3.8 and matching pips
 set -ex
 
 echo "deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu trusty main" > /etc/apt/sources.list.d/deadsnakes.list
