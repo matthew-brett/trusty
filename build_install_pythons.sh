@@ -8,16 +8,16 @@ apt-get update
 apt-get install -y wget
 PIP_ROOT_URL="https://bootstrap.pypa.io"
 wget $PIP_ROOT_URL/get-pip.py
-for pyver in 3.4 3.5 3.6 2.7 2.6 3.3 ; do
+for pyver in 3.4 3.5 3.6 3.3 ; do
     pybin=python$pyver
     apt-get install -y ${pybin}-dev ${pybin}-tk
     get_pip_fname="get-pip.py"
     # Older Pythons need older versions of pip
     # These stored in URL directories named for the version.
-    for badver in 2.6 3.3 3.4; do
+    for badver in 3.3 3.4 3.5; do
         if [ "$pyver" == "$badver" ]; then
             get_pip_fname="get-pip-${pyver}.py"
-            wget $PIP_ROOT_URL/${pyver}/get-pip.py -O $get_pip_fname
+            wget $PIP_ROOT_URL/pip/${pyver}/get-pip.py -O $get_pip_fname
         fi
     done
     ${pybin} ${get_pip_fname}
@@ -34,6 +34,13 @@ apt-get -y install build-essential $BUILD_PKGS
 function compile_python {
     local py_ver="$1"
     local extra_args="$2"
+    local default_abi_suff="m"
+    # Python 3.8 and up no longer uses the PYMALLOC 'm' suffix
+    # https://github.com/pypa/wheel/pull/303
+    if [ ${py_nodot} -ge "38" ]; then
+        default_abi_suff=""
+    fi
+    local abi_suff="${3:-$default_abi_suff}"
     local froot="Python-${py_ver}"
     local ftgz="${froot}.tgz"
     # Drop any suffix from three-digit version number
@@ -41,12 +48,6 @@ function compile_python {
     wget https://www.python.org/ftp/python/${py_nums}/${ftgz}
     tar zxf ${ftgz}
     local py_nodot=$(echo ${py_ver} | awk -F "." '{ print $1$2 }')
-    local abi_suff=m
-    # Python 3.8 and up no longer uses the PYMALLOC 'm' suffix
-    # https://github.com/pypa/wheel/pull/303
-    if [ ${py_nodot} -ge "38" ]; then
-        abi_suff=""
-    fi
     local out_root=/opt/cp${py_nodot}${abi_suff}
     mkdir $out_root
     (cd Python-${py_ver} \
@@ -57,11 +58,12 @@ function compile_python {
     rm -rf ${froot} ${ftgz}
 }
 
-# Compile narrow unicode Python
+# Compile wide and narrow unicode Python
 # Compiled Pythons need to be flagged in the choose_python.sh script.
-compile_python 2.7.11 "--enable-unicode=ucs2"
-# Get pip for narrow unicode Python
-/opt/cp27m/bin/python get-pip.py
+compile_python 2.7.18 "--enable-unicode=ucs4" "mu"
+/opt/cp27mu/bin/python -m ensurepip
+compile_python 2.7.18 "--enable-unicode=ucs2"
+/opt/cp27m/bin/python -m ensurepip
 
 # Compile Python 3.7.0, pip comes along with.
 # Python 3.7 from deadsnakes does not appear to have SSL.
