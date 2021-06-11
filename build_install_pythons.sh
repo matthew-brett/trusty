@@ -17,7 +17,7 @@ for pyver in 3.4 3.5 3.6 2.7 2.6 3.3 ; do
     for badver in 2.6 3.3 3.4 3.5; do
         if [ "$pyver" == "$badver" ]; then
             get_pip_fname="get-pip-${pyver}.py"
-            wget $PIP_ROOT_URL/${pyver}/get-pip.py -O $get_pip_fname
+            wget $PIP_ROOT_URL/pip/${pyver}/get-pip.py -O $get_pip_fname
         fi
     done
     ${pybin} ${get_pip_fname}
