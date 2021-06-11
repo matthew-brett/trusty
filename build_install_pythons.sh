@@ -14,7 +14,7 @@ for pyver in 3.4 3.5 3.6 2.7 2.6 3.3 ; do
     get_pip_fname="get-pip.py"
     # Older Pythons need older versions of pip
     # These stored in URL directories named for the version.
-    for badver in 2.6 3.3 3.4; do
+    for badver in 2.6 3.3 3.4 3.5; do
         if [ "$pyver" == "$badver" ]; then
             get_pip_fname="get-pip-${pyver}.py"
             wget $PIP_ROOT_URL/${pyver}/get-pip.py -O $get_pip_fname
